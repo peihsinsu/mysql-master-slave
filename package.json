@@ -1,0 +1,16 @@
+{
+  "name": "mysql-master-slave",
+  "version": "0.0.1",
+  "description": "mysql master slave cluster util",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.6.1",
+    "nodeutil": "0.0.46",
+    "underscore": "^1.8.3"
+  }
+}
