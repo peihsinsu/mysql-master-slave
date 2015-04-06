@@ -3,13 +3,13 @@ MySQL Master Slave
 
 This module is depend on mysql module for build the master, slave database environment. 
 
-# Installation
+## Installation
 
 ```
 npm install mysql-master-slave
 ```
 
-# Usage Sampple:
+## Usage Sampple:
 
 ```
 var cluster = require('mysql-master-slave');
@@ -39,3 +39,78 @@ cluster.pool.query(sql, [new Date()], function(err, r, f){
   process.exit(0);
 });
 ```
+
+Execution result:
+
+```
+node test.js
+[2015-04-06 09:31:26.424] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.427] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:31:26.431] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.431] [INFO] [default] - [index.js - getPool] using master pool[0]
+[2015-04-06 09:31:26.432] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.432] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:31:26.433] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.434] [INFO] [default] - [index.js - getPool] using master pool[0]
+[2015-04-06 09:31:26.434] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.435] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:31:26.436] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.436] [INFO] [default] - [index.js - getPool] using master pool[0]
+[2015-04-06 09:31:26.437] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.437] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:31:26.437] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.437] [INFO] [default] - [index.js - getPool] using master pool[0]
+[2015-04-06 09:31:26.438] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.439] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:31:26.439] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:31:26.439] [INFO] [default] - [index.js - getPool] using master pool[0]
+Result: { fieldCount: 0,
+  affectedRows: 1,
+  insertId: 40,
+  serverStatus: 2,
+  warningCount: 0,
+  message: '',
+  protocol41: true,
+  changedRows: 0 }
+```
+
+## Others
+
+Setup as sequence read from pool or random select.
+
+```
+cluster.setDbSelectStrategy(1);
+```
+
+Result:
+
+```
+[2015-04-06 09:37:23.767] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.774] [INFO] [default] - [index.js - getPool] using master pool[0]
+[2015-04-06 09:37:23.778] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.778] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:37:23.779] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.779] [INFO] [default] - [index.js - getPool] using master pool[0]
+[2015-04-06 09:37:23.779] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.780] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:37:23.780] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.780] [INFO] [default] - [index.js - getPool] using master pool[0]
+[2015-04-06 09:37:23.781] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.781] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:37:23.782] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.782] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:37:23.782] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.782] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:37:23.784] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.784] [INFO] [default] - [index.js - getPool] using master pool[1]
+[2015-04-06 09:37:23.785] [DEBUG] [default] - [index.js - query] using master pool...
+[2015-04-06 09:37:23.785] [INFO] [default] - [index.js - getPool] using master pool[0]
+Result: { fieldCount: 0,
+  affectedRows: 1,
+  insertId: 50,
+  serverStatus: 2,
+  warningCount: 0,
+  message: '',
+  protocol41: true,
+  changedRows: 0 }
+``` 

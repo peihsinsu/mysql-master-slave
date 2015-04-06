@@ -42,7 +42,6 @@ exports.pool = {
 function query(sql, opts, callback) {
   if(sql.toLowerCase().indexOf('select') >= 0) {
     //using read only pool
-    log.debug('using slave pool...');
     if(typeof(opts) == 'function') {
       return getPool('slave').query(sql, opts);
     } else {
@@ -50,7 +49,6 @@ function query(sql, opts, callback) {
     }
   } else {
     // using read write pool
-    log.debug('using master pool...');
     if(typeof(opts) == 'function') {
       return getPool('master').query(sql, opts);
     } else {
@@ -66,12 +64,12 @@ function getPool(type) {
     //sequence get
 		db.curr_idx++;
 		db.curr_idx = db.curr_idx % db.instances.length;
-    log.info('using %s pool[%s]', type, db.curr_idx);
+    log.debug('using %s pool[%s]', type, db.curr_idx);
     return db.instances[db.curr_idx];
   } else {
     //random get
     var idx = _.random(0, db.instances.length - 1);
-    log.info('using %s pool[%s]', type, idx);
+    log.debug('using %s pool[%s]', type, idx);
     return db.instances[idx];
   }
 }
