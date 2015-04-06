@@ -70,7 +70,7 @@ function getPool(type) {
     return db.instances[db.curr_idx];
   } else {
     //random get
-    var idx = _.random(0, db.instances.length);
+    var idx = _.random(0, db.instances.length - 1);
     log.info('using %s pool[%s]', type, idx);
     return db.instances[idx];
   }

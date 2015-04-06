@@ -1,6 +1,6 @@
 {
   "name": "mysql-master-slave",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "mysql master slave cluster util",
   "main": "index.js",
   "scripts": {
