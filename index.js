@@ -21,6 +21,11 @@ var slave = {
   curr_idx:0
 };
 
+exports.pools = {
+	master: master, 
+	slave: slave
+}
+
 exports.addMaster = function(ip, port, opts) {
   opts.host = ip;
   opts.port = port;
@@ -58,6 +63,7 @@ function query(sql, opts, callback) {
 }
 
 function getPool(type) {
+	if(slave.instances.length <= 0) type = 'master';
   var db = (type == 'master') ? master: slave;
   
   if(select_strategy == 0) {
