@@ -64,6 +64,48 @@ Result: { fieldCount: 0,
   changedRows: 0 }
 ```
 
+## About Transaction
+
+If you want to use transaction in your project. There is a quick way to implememt transaction use "cluster.beginTransaction()" and "tx.addJob()"...
+
+```
+var cluster = require('mysql-master-slave');
+
+var opts = {
+  connectionLimit : 10,
+  user: 'root',
+  password: '123456',
+  database: 'mydb' 
+}
+
+cluster.setDbSelectStrategy(1);
+
+cluster.addMaster('123.123.123.123', '3306', opts);
+cluster.addMaster('124.124.124.124', '3306', opts);
+
+var tx = cluster.beginTransaction();
+
+tx.addJob('insert into test123 (id, create_date, data) values (?, ?, ?)', [50, new Date(), "test 中文"], function(){
+  console.log('job1 done...');
+})
+
+tx.addJob('select * from test123 where id =?', [51, "test 中文"], function(err, result){
+  console.log('verify job1 done...');
+  if(err) {
+    console.log('error:', err);
+  }
+
+  console.log('result:', result);
+});
+
+tx.exec(function(err, result){
+  if(err) {
+    console.log('err:', err);
+  }
+  console.log('>>>', result);
+});
+```
+
 ## Others
 
 Setup as sequence read from pool or random select.
@@ -94,3 +136,4 @@ Result: { fieldCount: 0,
   protocol41: true,
   changedRows: 0 }
 ``` 
+
