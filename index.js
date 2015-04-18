@@ -72,12 +72,12 @@ function getPool(type) {
     //sequence get
 		db.curr_idx++;
 		db.curr_idx = db.curr_idx % db.instances.length;
-    log.debug('using %s pool[%s]', type, db.curr_idx);
+    log.trace('using %s pool[%s]', type, db.curr_idx);
     return db.instances[db.curr_idx];
   } else {
     //random get
     var idx = _.random(0, db.instances.length - 1);
-    log.debug('using %s pool[%s]', type, idx);
+    log.trace('using %s pool[%s]', type, idx);
     return db.instances[idx];
   }
 }
@@ -90,13 +90,13 @@ function getPoolConnection(type) {
     //sequence get
     db.curr_idx++;
     db.curr_idx = db.curr_idx % db.instances.length;
-    log.debug('using %s pool[%s]', type, db.curr_idx);
+    log.trace('using %s pool[%s]', type, db.curr_idx);
     var cfg = db.config[db.curr_idx];
     return mysql.createConnection(cfg);
   } else {
     //random get
     var idx = _.random(0, db.instances.length - 1);
-    log.debug('using %s pool[%s]', type, idx);
+    log.trace('using %s pool[%s]', type, idx);
     // return db.instances[idx];
     var cfg = db.config[idx];
     return mysql.createConnection(cfg);
@@ -106,6 +106,10 @@ function getPoolConnection(type) {
 exports.beginTransaction = function() {
   var tx = {
     jobs:[],
+    rollback_state: {
+      ROLLBACK: 'rollback',
+      PASS_ROLLBACK: 'pass_rollback'
+    },
     addJob: function(sql, cond, callback) {
       this.jobs.push({
         sql: sql,
@@ -123,7 +127,7 @@ exports.beginTransaction = function() {
         // }
         var jobs = reverseArr(this.jobs);
 
-        log.debug('got jobs:', jobs);
+        log.trace('got jobs:', jobs);
 
         connection.beginTransaction(function(err) {
           if (err) { 
@@ -143,10 +147,10 @@ exports.beginTransaction = function() {
             connection.query(job.sql, job.cond, function(err, result){
               log.debug('[SQL]', job.sql);
               log.debug('[Cond]', job.cond);
-              //execute job callback
-              job.callback(err, result);
 
-              if (err) { 
+              //execute job callback, default will rollback error process
+              var is_rollback = job.callback(err, result, connection) == 'pass_rollback' ? false : true ;
+              if (err && is_rollback) { 
                 return connection.rollback(function() {
                   //throw err;
                   if(!callback)
@@ -158,15 +162,20 @@ exports.beginTransaction = function() {
                 });
               }
 
-              tx_result.push({
+              var r = {
                 job: job, result: result
-              });
+              }
+              if(!is_rollback) {
+                r['error'] = err;
+                r['pass_rollback'] = true; 
+              }
+              tx_result.push(r);
 
               if(jobs.length > 0) {
                 doJob();
               } else {
                 connection.commit(function(err) {
-                  if (err) { 
+                  if (err && is_rollback) { 
                     connection.rollback(function() {
                       //throw err;
                       if(!callback)
@@ -175,7 +184,7 @@ exports.beginTransaction = function() {
                         callback(err, result)
                     });
                   }
-                  log.debug('transaction commited...');
+                  log.trace('transaction commited...');
                   connection.end();
                   if(callback)
                     callback(err, tx_result)
